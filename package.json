@@ -1,0 +1,32 @@
+{
+  "name": "@dev-hbc94/postcode_for_rn",
+  "version": "1.0.0",
+  "description": "React Native용 카카오 우편번호 서비스 WebView wrapper 라이브러리",
+  "license": "MIT",
+  "author": "dev-hbc94",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "keywords": [
+    "react-native",
+    "kakao",
+    "postcode",
+    "address",
+    "daum",
+    "webview",
+    "우편번호",
+    "주소검색"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dev-hbc94/postcode_for_rn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dev-hbc94/postcode_for_rn.git/issues"
+  },
+  "homepage": "https://github.com/dev-hbc94/postcode_for_rn.git#readme",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.73",
+    "react-native-webview": ">=13"
+  }
+}
