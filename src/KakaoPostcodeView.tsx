@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Linking } from 'react-native';
 import type { WebViewMessageEvent } from 'react-native-webview';
 import { WebView } from 'react-native-webview';
 
@@ -38,25 +37,6 @@ export function KakaoPostcodeView({
     }
     return buildKakaoPostcodeHtml({ config: mergedConfig });
   }, [htmlFactory, mergedConfig]);
-
-  // F-06: config 도메인 기반 originWhitelist
-  const allowedOrigins = useMemo(() => {
-    const urls = [
-      mergedConfig.endpoints.baseUrl,
-      mergedConfig.endpoints.guideUrl,
-      mergedConfig.endpoints.serviceUrl,
-      mergedConfig.endpoints.scriptUrl,
-      ...mergedConfig.endpoints.fallbackScriptUrls,
-    ];
-    const origins = urls.flatMap((url) => {
-      try {
-        return [new URL(url).origin];
-      } catch {
-        return [];
-      }
-    });
-    return ['about:blank', ...new Set(origins)];
-  }, [mergedConfig.endpoints]);
 
   // H-02: onComplete/onError/onEvent를 ref로 유지해 stale closure 방지
   const onCompleteRef = useRef(onComplete);
@@ -115,7 +95,7 @@ export function KakaoPostcodeView({
   return (
     <WebView
       {...webViewProps}
-      originWhitelist={allowedOrigins}
+      originWhitelist={['*']}
       source={{ html, baseUrl: mergedConfig.endpoints.baseUrl }}
       javaScriptEnabled
       domStorageEnabled
@@ -124,19 +104,13 @@ export function KakaoPostcodeView({
       setSupportMultipleWindows={false}
       onMessage={handleMessage}
       onShouldStartLoadWithRequest={(request) => {
-        // F-07: 위험한 URL 스킴 명시적 차단 (javascript:, data:, file: 등)
         const url = request.url ?? '';
         if (!url || url === 'about:blank') return true;
-        const isKakaoOrigin = url.startsWith(mergedConfig.endpoints.baseUrl);
-        const isHttps = url.startsWith('https://');
-        const isHttp = url.startsWith('http://');
-        if (isKakaoOrigin) return true;
-        if (isHttps || (__DEV__ && isHttp)) {
-          Linking.openURL(url).catch(() => {});
+        // dangerous scheme(javascript:, data:, file:)만 차단, HTTP/HTTPS는 모두 허용
+        if (url.startsWith('javascript:') || url.startsWith('data:') || url.startsWith('file:') || url.startsWith('blob:')) {
           return false;
         }
-        // javascript:, data:, file: 등 차단
-        return false;
+        return true;
       }}
       style={style}
     />
